@@ -6,7 +6,7 @@ import time
 try:
     from jeedom.jeedom import *
 except ImportError:
-    print "Error: importing module jeedom"
+    print("Error: importing module jeedom")
     sys.exit(1)
 
 globals.sendLock = threading.RLock()
@@ -56,7 +56,7 @@ class mysensors_socket(threading.Thread):
                 logging.debug("[%s] Connexion en cours... sur %s:%s" % (self.id_jeedom.center(5, ' '), self.ip_gw, self.port_gw))
                 globals.KNOWN_DEVICES[self.id_jeedom]['objCo'] = socket.create_connection((self.ip_gw, self.port_gw))
                 globals.ErrCo[self.id_jeedom] = False
-            except Exception,e:
+            except Exception as e:
                 globals.ErrCo[self.id_jeedom] = True
                 logging.error("[%s] Erreur de connexion pour %s:%s... : %s" % (self.id_jeedom.center(5, ' '), self.ip_gw, str(self.port_gw), str(e)))
                 time.sleep(5)
@@ -144,7 +144,7 @@ class mysensors_serial(threading.Thread):
                 globals.KNOWN_DEVICES[self.id_jeedom]['objCo'].flushOutput()
                 globals.KNOWN_DEVICES[self.id_jeedom]['objCo'].flushInput()
                 globals.ErrCo[self.id_jeedom] = False
-            except Exception,e:
+            except Exception as e:
                 globals.ErrCo[self.id_jeedom] = True
                 logging.error("[%s] Erreur de connexion pour %s... : %s" % (self.id_jeedom.center(5, ' '), self.port_gw, str(e)))
                 time.sleep(5)
@@ -162,7 +162,7 @@ class mysensors_serial(threading.Thread):
             message = None
             try:
                 byte = globals.KNOWN_DEVICES[self.id_jeedom]['objCo'].read()
-            except Exception, e:
+            except Exception as e:
                 if str(e) == '[Errno 5] Input/output error':
                     logging.error("Exit 1 because this exeption is fatal")
                     self.stop()
@@ -171,7 +171,7 @@ class mysensors_serial(threading.Thread):
                     message = (byte + globals.KNOWN_DEVICES[self.id_jeedom]['objCo'].readline()).decode('ascii')
                     if message.endswith('\n'):
                         send_to_jeedom('SERIAL', self.id_jeedom, message).start()
-            except Exception,e:
+            except Exception as e:
                 logging.error("[%s] Erreur analyse du message : %s" % (self.id_jeedom.center(5, ' '), str(e)))
 
 ###########################
@@ -270,7 +270,7 @@ class send_to_jeedom(threading.Thread):
                     return
             else:
                 return
-        except Exception, e:
+        except Exception as e:
             pass
         else:
             try:
@@ -278,6 +278,6 @@ class send_to_jeedom(threading.Thread):
                     time.sleep(0.1)
                     globals.JEEDOM_COM.send_change_immediate({'message' : message});
                     #globals.JEEDOM_COM.add_changes('message', message)
-            except Exception, e:
+            except Exception as e:
                 pass
         return

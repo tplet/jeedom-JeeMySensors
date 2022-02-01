@@ -2,7 +2,7 @@
 #
 # Jeedom is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
+# the Free Software Foundation as either version 3 of the License, or
 # (at your option) any later version.
 #
 # Jeedom is distributed in the hope that it will be useful,
@@ -24,9 +24,16 @@ import serial
 import os
 from os.path import join
 import socket
-from Queue import Queue
-import SocketServer
-from SocketServer import (TCPServer, StreamRequestHandler)
+try:
+   import queue
+except ImportError:
+   import Queue as queue
+from queue import Queue
+try:
+   import socketserver
+except ImportError:
+   import SocketServer as socketserver
+from socketserver import (TCPServer, StreamRequestHandler)
 import signal
 import unicodedata
 import pyudev
@@ -191,7 +198,9 @@ class jeedom_utils():
 	def write_pid(path):
 		pid = str(os.getpid())
 		logging.debug("Writing PID " + pid + " to " + str(path))
-		file(path, 'w').write("%s\n" % pid)
+		fo = open(path, 'w')
+		fo.write("%s\n" % pid)
+		fo.close()
 		
 	@staticmethod
 	def remove_accents(input_str):
@@ -218,7 +227,7 @@ class jeedom_serial():
 		logging.debug("Open Serialport")
 		try:  
 			self.port = serial.Serial(self.device,self.rate,timeout=self.timeout)
-		except serial.SerialException, e:
+		except serial.SerialException as e:
 			logging.error("Error: Failed to connect on device " + self.device + " Details : " + str(e))
 			return False
 		if not self.port.isOpen():
@@ -253,7 +262,7 @@ class jeedom_serial():
 		try:
 			if self.port.inWaiting() != 0:
 				return self.port.read()
-		except IOError, e:
+		except IOError as e:
 			logging.error("Serial read error: %s" % (str(e)))
 		return None
 
@@ -262,7 +271,7 @@ class jeedom_serial():
 			in_data = self.port.readline()
 			if in_data:
 				return in_data
-		except IOError, e:
+		except IOError as e:
 			logging.error("Serial readline error: %s" % (str(e)))
 		return ""
 
@@ -271,9 +280,9 @@ class jeedom_serial():
 		for i in range(number):
 			try:
 				byte = self.port.read()
-			except IOError, e:
+			except IOError as e:
 				logging.error("Error: %s" % e)
-			except OSError, e:
+			except OSError as e:
 				logging.error("Error: %s" % e)
 			buf += byte
 		return buf

@@ -5,7 +5,11 @@ echo "*             Installation des dépendances             *"
 echo "********************************************************"
 apt-get update
 echo 50 > /tmp/dependancy_JeeMySensors_in_progress
-apt-get install -y python3-serial python3-requests python3-pyudev
+wget https://bootstrap.pypa.io/pip/2.7/get-pip.py
+python get-pip.py
+rm get-pip.py
+echo 70 > /tmp/dependancy_JeeMySensors_in_progress
+python -m pip install requests serial pyudev
 echo 100 > /tmp/dependancy_JeeMySensors_in_progress
 echo "********************************************************"
 echo "*             Installation terminée                    *"

@@ -26,14 +26,14 @@ import argparse
 
 try:
     from jeedom.jeedom import *
-except ImportError:
-    print "Error: importing module jeedom.jeedom"
+except ImportError as error:
+    print("Error: importing module jeedom.jeedom (" + error.message + ")")
     sys.exit(1)
 
 try:
     from JeeMySensors.JeeConnexion import *
-except ImportError:
-    print "Error: importing module JeeMySensors.JeeConnexion"
+except ImportError as error:
+    print("Error: importing module JeeMySensors.JeeConnexion (" + error.message + ")")
     sys.exit(1)
 
 # lire les donnees de Jeedom en socket
@@ -58,7 +58,7 @@ def read_socket(name):
                                 add_gw(gateway_id, heartbeat, type_gw, addr_gw)
                             else:
                                 modif_gw(gateway_id, heartbeat, type_gw, addr_gw)
-                    except Exception, e:
+                    except Exception as e:
                         logging.error('[%s] Add Gateway command to MySensors error : %s' % (gateway_id.center(5, ' '), str(e)))
                 # Supprime une gateway
                 if message['cmd'] == 'delgw':
@@ -66,7 +66,7 @@ def read_socket(name):
                         gateway_id = message['gateway']
                         if (len(gateway_id) != 0 and globals.KNOWN_DEVICES.has_key(gateway_id)):
                             del_gw(gateway_id, 0)
-                    except Exception, e:
+                    except Exception as e:
                         logging.error('Delete Gateway command to MySensors error : '+str(e))
                 # Envoi un message sur la gateway choisie
                 if message['cmd'] == 'send':
@@ -75,7 +75,7 @@ def read_socket(name):
                         if globals.KNOWN_DEVICES.has_key(gateway_id):
                             data = (message['data'] + '\n').encode('ascii')
                             send_mysensors(gateway_id, data)
-                    except Exception, e:
+                    except Exception as e:
                         logging.error('Send command to MySensors error : '+str(e))
         except Exception as e:
             logging.error("Exception on socket : %s" % str(e))
@@ -123,7 +123,7 @@ def del_gw(gateway_id, modif):
     try:
         jeeThreadCo[gateway_id].stop()
         jeeThreadCo[gateway_id].join()
-    except Exception, e:
+    except Exception as e:
         logging.error("Erreur sur la fermeture du port : " + str(e))
         pass
     if (modif == 0):
@@ -137,14 +137,14 @@ def send_mysensors(gateway_id, data):
             globals.KNOWN_DEVICES[gateway_id]['objCo'].flushInput()
             globals.KNOWN_DEVICES[gateway_id]['objCo'].write(data)
             logging.debug('[%s] |--> Message Serial Write : %s' % (gateway_id.center(5, ' '), data))
-        except Exception, e:
+        except Exception as e:
             logging.error('[%s] |--> ERREUR Message Serial Write : %s' % (gateway_id.center(5, ' '), str(e)))
             pass
     if (globals.KNOWN_DEVICES[gateway_id]['type'] == 'lan'):
         try:
             globals.KNOWN_DEVICES[gateway_id]['objCo'].send(data)
             logging.debug('[%s] |--> Message Lan Write : %s' % (gateway_id.center(5, ' '), data))
-        except Exception, e:
+        except Exception as e:
             logging.error('[%s] |--> ERREUR Lan Serial Write : %s' % (gateway_id.center(5, ' '), str(e)))
             pass
 
@@ -237,6 +237,6 @@ try:
         logging.error('Network communication issues. Please fixe your Jeedom network configuration.')
     jeedom_socket = jeedom_socket(port=_socket_port,address=_socket_host)
     listen()
-except Exception,e:
+except Exception as e:
     logging.error('Fatal error : '+str(e))
     shutdown()

@@ -29,7 +29,7 @@ class JeeMySensors extends eqLogic {
     public static function dependancy_info() {
         $return = array();
         $return['progress_file'] = jeedom::getTmpFolder('JeeMySensors') . '/dependance';
-        if (exec(system::getCmdSudo() . system::get('cmd_check') . '-E "python3\-serial|python3\-request|python3\-pyudev" | wc -l') >= 3) {
+        if (exec(system::getCmdSudo() . system::get('cmd_check') . '-E "python\-serial|python\-request|python\-pyudev" | wc -l') >= 3) {
             $return['state'] = 'ok';
         } else {
             $return['state'] = 'nok';
@@ -65,7 +65,7 @@ class JeeMySensors extends eqLogic {
             throw new Exception(__('Veuillez vérifier la configuration', __FILE__));
         }
         $JeeMySensors_path = realpath(dirname(__FILE__) . '/../../resources/demond');
-        $cmd = '/usr/bin/python ' . $JeeMySensors_path . '/JeeMySensorsd.py';
+        $cmd = '/usr/bin/python3 ' . $JeeMySensors_path . '/JeeMySensorsd.py';
         $cmd .= ' --loglevel ' . log::convertLogLevel(log::getLogLevel('JeeMySensors'));
         $cmd .= ' --socketport ' . config::byKey('socketport', 'JeeMySensors');
         $cmd .= ' --callback ' . network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/JeeMySensors/core/php/JeeMySensors.inc.php';
